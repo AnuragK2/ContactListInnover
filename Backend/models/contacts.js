@@ -25,9 +25,13 @@ const contactSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    gender: {
+        type: String,
+        required: true
+    },
     dateOfBirth: {
         type: Date,
-        required: false
+        required: true
     },
     company: {
         type: String,

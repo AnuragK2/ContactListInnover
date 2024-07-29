@@ -61,8 +61,8 @@ const ContactListComponent = () => {
     }
   };
 
-  const updateContact = (id) => {
-    navigate(`/update-contact/${id}`);
+  const updateContact = (contact) => {
+    navigate(`/update-contact/${contact._id}`, { state: { contact } });
   };
 
   const createContact = () => {
@@ -106,7 +106,7 @@ const ContactListComponent = () => {
               <Typography>{contact.email}</Typography>
               <Typography>{contact.phoneNumber}</Typography>
               <div>
-                <IconButton onClick={() => updateContact(contact._id)} color="primary">
+                <IconButton onClick={() => updateContact(contact)} color="primary">
                   <EditIcon />
                 </IconButton>
                 <IconButton onClick={() => deleteContact(contact._id)} color="secondary">

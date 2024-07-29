@@ -27,9 +27,9 @@ const fetchContactsById = async (req, res) => {
 
 const createContacts = async (req, res) => {
     try {
-        const { firstName, lastName, email, phoneNumber, address, city, state, zipCode, dateOfBirth, company, website, message } = req.body;
+        const { firstName, lastName, email, phoneNumber, address, city, state, zipCode, dateOfBirth, gender, company, website, message } = req.body;
 
-        if (!firstName || !lastName) {
+        if (!firstName || !lastName || !dateOfBirth || !phoneNumber || !gender) {
             return res.status(400).json({ success: false, message: "Fields are required" });
         }
 
@@ -48,6 +48,7 @@ const createContacts = async (req, res) => {
             phoneNumber,
             address: [savedAddress._id],
             dateOfBirth: new Date(dateOfBirth),
+            gender,
             company,
             website,
             message
@@ -64,7 +65,7 @@ const createContacts = async (req, res) => {
 const updateContact = async (req, res) => {
     try {
         const contactsId = req.params.id;
-        const { firstName, lastName, email, phoneNumber, address, city, state, zipCode, dateOfBirth, company, website, message } = req.body;
+        const { firstName, lastName, email, phoneNumber, address, city, state, zipCode, dateOfBirth, gender, company, website, message } = req.body;
 
         let contact = await Contact.findById(contactsId);
         if (!contact) {
@@ -87,6 +88,7 @@ const updateContact = async (req, res) => {
         contact.email = email || contact.email;
         contact.phoneNumber = phoneNumber || contact.phoneNumber;
         contact.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : contact.dateOfBirth;
+        contact.gender = gender || contact.gender;
         contact.company = company || contact.company;
         contact.website = website || contact.website;
         contact.message = message || contact.message;

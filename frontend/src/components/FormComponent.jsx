@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { Grid } from '@mui/material';
+import { Grid, FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const FormControl = styled('div')(({ theme }) => ({
+const FormControlWrapper = styled(FormControl)(({ theme }) => ({
   marginBottom: theme.spacing(1),
+  width: '100%',
 }));
 
 const FormComponent = () => {
@@ -24,14 +25,16 @@ const FormComponent = () => {
     company: '',
     website: '',
     message: '',
+    gender: '',
   });
 
   const [isEditMode, setIsEditMode] = useState(false);
+  const [errors, setErrors] = useState({});
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const contact = location.state?.contact; // Retrieve contact from state
+    const contact = location.state?.contact;
     if (contact) {
       setFormData({
         firstName: contact.firstName || '',
@@ -46,8 +49,9 @@ const FormComponent = () => {
         company: contact.company || '',
         website: contact.website || '',
         message: contact.message || '',
+        gender: contact.gender || '',
       });
-      setIsEditMode(true); // Set edit mode if contact data is present
+      setIsEditMode(true);
     }
   }, [location.state?.contact]);
 
@@ -59,23 +63,34 @@ const FormComponent = () => {
     });
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.firstName) newErrors.firstName = 'First name is required';
+    if (!formData.lastName) newErrors.lastName = 'Last name is required';
+    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
+    if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
+    if (!formData.gender) newErrors.gender = 'Gender is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     const formattedData = {
       ...formData,
-      dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : ''
+      dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : '',
     };
 
     try {
       if (isEditMode) {
-        // Update existing contact
-        const contactId = location.state?.contact._id; // Get the contact ID from state
+        const contactId = location.state?.contact._id;
         await axios.put(`http://localhost:4000/contacts/${contactId}`, formattedData);
       } else {
-        // Create new contact
         await axios.post('http://localhost:4000/contacts', formattedData);
       }
-      navigate('/'); // Redirect to the home page after successful operation
+      navigate('/');
     } catch (error) {
       console.error('Error handling contact:', error.response ? error.response.data : error.message);
     }
@@ -86,7 +101,7 @@ const FormComponent = () => {
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.firstName}
@@ -94,11 +109,14 @@ const FormComponent = () => {
                 label="First Name"
                 name="firstName"
                 variant="outlined"
+                required
+                error={!!errors.firstName}
+                helperText={errors.firstName}
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.lastName}
@@ -106,11 +124,14 @@ const FormComponent = () => {
                 label="Last Name"
                 name="lastName"
                 variant="outlined"
+                required
+                error={!!errors.lastName}
+                helperText={errors.lastName}
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.phoneNumber}
@@ -118,11 +139,14 @@ const FormComponent = () => {
                 label="Phone Number"
                 name="phoneNumber"
                 variant="outlined"
+                required
+                error={!!errors.phoneNumber}
+                helperText={errors.phoneNumber}
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.email}
@@ -131,10 +155,10 @@ const FormComponent = () => {
                 name="email"
                 variant="outlined"
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.address}
@@ -143,10 +167,10 @@ const FormComponent = () => {
                 name="address"
                 variant="outlined"
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.city}
@@ -155,10 +179,10 @@ const FormComponent = () => {
                 name="city"
                 variant="outlined"
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.state}
@@ -167,10 +191,10 @@ const FormComponent = () => {
                 name="state"
                 variant="outlined"
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.zipCode}
@@ -179,10 +203,10 @@ const FormComponent = () => {
                 name="zipCode"
                 variant="outlined"
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.dateOfBirth}
@@ -194,11 +218,34 @@ const FormComponent = () => {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                required
+                error={!!errors.dateOfBirth}
+                helperText={errors.dateOfBirth}
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
+              <InputLabel>Gender</InputLabel>
+              <Select
+                value={formData.gender}
+                onChange={updateFormField}
+                              name="gender"
+                              label="gender"
+                              fullWidth
+                variant="outlined"
+                required
+                              error={!!errors.gender}
+                              helperText={errors.gender}
+              >
+                <MenuItem value="male">Male</MenuItem>
+                <MenuItem value="female">Female</MenuItem>
+              </Select>
+              {!!errors.gender && <FormHelperText error>{errors.gender}</FormHelperText>}
+            </FormControlWrapper>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.company}
@@ -207,10 +254,10 @@ const FormComponent = () => {
                 name="company"
                 variant="outlined"
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.website}
@@ -219,10 +266,10 @@ const FormComponent = () => {
                 name="website"
                 variant="outlined"
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12}>
-            <FormControl>
+            <FormControlWrapper>
               <TextField
                 onChange={updateFormField}
                 value={formData.message}
@@ -233,7 +280,7 @@ const FormComponent = () => {
                 multiline
                 rows={4}
               />
-            </FormControl>
+            </FormControlWrapper>
           </Grid>
           <Grid item xs={12}>
             <Button variant="contained" color="primary" type="submit">
